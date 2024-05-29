@@ -20,7 +20,7 @@ class Mangement:
             file.write(writing)
     
     def read(self):
-            output:list[dict[str,str|float]] = []
+            output:list[dict[str,dict[str,float|str]]] = []
             with open(self.file,"r") as file:
                 entries = file.readlines()
                 entries.remove(0)
@@ -32,7 +32,7 @@ class Mangement:
     def write(self,time:str,weight:float,fat:float):
         with open(self.file,"r") as file:
             height = float(file.readline().rstrip())
-            bmi = weight/(height ** 2)
+            bmi = weight/((height/100) ** 2)
         with open(self.file,"a") as file:
             file.write("\n")
             file.write(f"{time} {weight} {fat} {bmi}")
