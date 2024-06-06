@@ -1,6 +1,6 @@
 from errors import *
 from os.path import isdir
-from os import mkdir
+from os import mkdir,walk,getcwd
 
 class Mangement:
     def __init__(self,user:str) -> None:
@@ -11,25 +11,35 @@ class Mangement:
         mkdir("data")
         self.user = username
 
-    def new(self,*data):
-        writing = ""
-        open(self.file,"x").close()
-        with open(self.file,"a") as file:
-            for i in data:
-                writing += f"{i} "
-            file.write(writing)
+    def new(self,Data:list[str]):
+            if self.__check__():
+                raise UserError("The user exists")
+            else:
+                pass
+            writing = ""
+            open(self.file,"x").close()
+            with open(self.file,"w") as file:
+                for data in Data:
+                    writing += f"{data} "
+                file.write(writing)
     
     def read(self):
+            if not self.__check__():
+                raise UserError("The user not exists")
+            else:
+                pass
             output:list[dict[str,dict[str,float|str]]] = []
-            with open(self.file,"r") as file:
-                entries = file.readlines()
-                entries.remove(0)
+            entries = open(self.file,"r").readlines()[1:]
             for entry in entries:
                 elements = entry.split(" ")
                 output.append({self.user:{"time":elements[0],"weight":elements[1],"fat":elements[2],"BMI":elements[3]}})
             return output
     
     def write(self,time:str,weight:float,fat:float):
+        if not self.__check__():
+            raise UserError("The user not exists")
+        else:
+            pass
         with open(self.file,"r") as file:
             height = float(file.readline().rstrip())
             bmi = weight/((height/100) ** 2)
@@ -38,11 +48,25 @@ class Mangement:
             file.write(f"{time} {weight} {fat} {bmi}")
 
     def update(self,data:list):
+        if not self.__check__():
+            raise UserError("The user not exists")
+        else:
+            pass
         with open(self.file,"r") as file:
             lines = file.readlines()
         lines[0] = data
-        with open(self.file,"w") as file:
-            file.writelines(lines)
+        for i in data:
+            with open(self.file,"w") as file:
+                file.write(f"{i}\n")
+
+    def __check__(self):
+        new = []
+        userlist = next(walk(getcwd()))[2]
+        for i in userlist:
+            new.append(i[:-7])
+        state = True if self.user in new else False
+        return state
+
 if __name__ == "__main__":
     data = Mangement("entry.weight").read()
     print(data)
