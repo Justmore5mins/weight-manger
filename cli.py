@@ -12,7 +12,7 @@ while True:
     else:
         if command == "/load":
             user = parts[1]
-            manger = Mangement(user)
+            manger = Mangement(user) if Mangement(user).__check__() else print("The user not exists")
 
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])

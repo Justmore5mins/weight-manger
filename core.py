@@ -24,10 +24,6 @@ class Mangement:
                 file.write(writing)
     
     def read(self):
-            if not self.__check__():
-                raise UserError("The user not exists")
-            else:
-                pass
             output:list[dict[str,dict[str,float|str]]] = []
             entries = open(self.file,"r").readlines()[1:]
             for entry in entries:
@@ -36,32 +32,24 @@ class Mangement:
             return output
     
     def write(self,time:str,weight:float,fat:float):
-        if not self.__check__():
-            raise UserError("The user not exists")
-        else:
-            pass
         with open(self.file,"r") as file:
-            height = float(file.readline().rstrip())
+            height = float(file.read().split("\n")[0])
             bmi = weight/((height/100) ** 2)
         with open(self.file,"a") as file:
             file.write("\n")
             file.write(f"{time} {weight} {fat} {bmi}")
 
-    def update(self,data:list):
-        if not self.__check__():
-            raise UserError("The user not exists")
-        else:
-            pass
-        with open(self.file,"r") as file:
-            lines = file.readlines()
-        lines[0] = data
+    def update(self,Hi:float):
+        with open(self.file,"r+") as file:
+            data = file.readlines()
+        data[0] = str(Hi)
         for i in data:
-            with open(self.file,"w") as file:
-                file.write(f"{i}\n")
+            i += "\n"
+        file.writelines(data)
 
     def __check__(self):
         new = []
-        userlist = next(walk(getcwd()))[2]
+        userlist = next(walk(f"{getcwd()}/data"))[2]
         for i in userlist:
             new.append(i[:-7])
         state = True if self.user in new else False
