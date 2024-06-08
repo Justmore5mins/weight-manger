@@ -1,6 +1,7 @@
 from errors import *
 from os.path import isdir
 from os import mkdir,walk,getcwd
+from math import floor
 
 class Mangement:
     def __init__(self,user:str) -> None:
@@ -34,7 +35,7 @@ class Mangement:
     def write(self,time:str,weight:float,fat:float):
         with open(self.file,"r") as file:
             height = float(file.read().split("\n")[0])
-            bmi = weight/((height/100) ** 2)
+            bmi = f"{int(weight/((height/100) ** 2)*100)/100}"
         with open(self.file,"a") as file:
             file.write("\n")
             file.write(f"{time} {weight} {fat} {bmi}")

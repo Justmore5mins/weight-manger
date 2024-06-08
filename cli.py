@@ -1,6 +1,5 @@
 from core import *
 from datetime import date
-from pandas import DataFrame
 
 COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/help"]
 
@@ -18,12 +17,21 @@ while True:
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])
         if command == "/read":
-            output:list[list[str]] = []
+            '''
+            user 9
+            '''
+            dat:list[list[str]] = []
+            output:list[str] = []
+            output.append("Time        User      Weight   BMI")
+            output.append("----------------------------------")
             for entry in manger.read():
                 data = entry.get(user)
-                output.append([data.get("time"),user,data.get("weight"),data.get("fat"),data.get("BMI")])
-            df = DataFrame(data,columns=["Time","User","Height","Fat Percentage","BMI"])
-            print(df.to_string())
+                dat.append([data.get("time"),user,data.get("weight"),data.get("fat"),data.get("BMI")])
+            for time,user,weight,fat,bmi in dat:
+                output.append(f"{time}  {user+" "*(10-len(user))}{weight+" "*(9-len(weight))}{bmi}")
+            for i in output:
+                print(i)
+
         if command == "/write":
             try:
                 time = parts[3]
