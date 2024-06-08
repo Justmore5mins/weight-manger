@@ -17,9 +17,6 @@ while True:
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])
         if command == "/read":
-            '''
-            user 9
-            '''
             dat:list[list[str]] = []
             output:list[str] = []
             output.append("Time        User      Weight   BMI")
