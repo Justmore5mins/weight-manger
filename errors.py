@@ -5,3 +5,7 @@ class InputError(Exception):
 class UserError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+class InternalError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

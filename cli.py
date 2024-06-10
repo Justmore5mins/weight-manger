@@ -1,7 +1,7 @@
 from core import *
 from datetime import date
 
-COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/help"]
+COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/draw","/help"]
 
 while True:
     entered = input("> ")
@@ -30,17 +30,22 @@ while True:
                 print(i)
 
         if command == "/write":
-            try:
-                time = parts[3]
-            except:
-                time = date.today()
-            manger.write(time=time,weight=float(parts[1]),fat=float(parts[2]))
+            time = parts[3] if len(parts) == 4 else datetime.strptime(date.today().strftime(r"%Y%m%d"),r"%Y%m%d")
+            manger.write(TIME=time,weight=float(parts[1]),fat=float(parts[2]))
         if command == "/update":
-            key,value = parts[1].split("=")
-            if key.lower() == "height":
-                manger.update([value])
+            test = 0
+            height = parts[1].split("=")[0]
+            if height.lower() == "height":
+                if manger.update(Hi=float(parts[1].split("=")[-1])) is None and test <= 10:
+                    manger.update(Hi=float(parts[1].split("=")[-1]))
+                    test += 1
+                elif manger.update(Hi=float(parts[1].split("=")[-1])) is None and test == 11:
+                    raise InternalError("Go GitHub write an issue and ")
             else:
                 print("it is only support height so far")
+        
+        if command == "/draw":
+            manger.draw()
         
         if command == "/help":
             help = []

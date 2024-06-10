@@ -6,3 +6,6 @@ command lists so far:
 - /read : read user's data
 - /update : update user's data /update height={user's height}
 - /help : show the help list
+
+notes: Windows users reccommmand to put this application into C:\user\ProgramFiles(x86)
+and Mac users can create a folder for this file(beacuse it will crate folders)

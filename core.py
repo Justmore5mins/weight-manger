@@ -2,6 +2,10 @@ from errors import *
 from os.path import isdir
 from os import mkdir,walk,getcwd
 from math import floor
+from matplotlib import pyplot as plt
+from datetime import datetime
+from bisect import bisect_left
+from os import system
 
 class Mangement:
     def __init__(self,user:str) -> None:
@@ -32,21 +36,43 @@ class Mangement:
                 output.append({self.user:{"time":elements[0],"weight":elements[1],"fat":elements[2],"BMI":elements[3]}})
             return output
     
-    def write(self,time:str,weight:float,fat:float):
+    def write(self,weight:float,fat:float,TIME:str):
+        times:list[datetime] = []
         with open(self.file,"r") as file:
-            height = float(file.read().split("\n")[0])
+            data = file.readlines()
+            height = float(data[0])
             bmi = f"{int(weight/((height/100) ** 2)*100)/100}"
         with open(self.file,"a") as file:
-            file.write("\n")
-            file.write(f"{time} {weight} {fat} {bmi}")
-
+            file.write(f"{TIME} {weight} {fat} {bmi}")
     def update(self,Hi:float):
-        with open(self.file,"r+") as file:
+        with open(self.file,"r") as file:
             data = file.readlines()
-        data[0] = str(Hi)
-        for i in data:
-            i += "\n"
-        file.writelines(data)
+            data[0] = f"{Hi}" if data else data.append(f"{Hi}")
+        with open(self.file,"w") as file:
+            for i in data:
+                file.write(f"{i}")
+        return Hi
+
+    def draw(self):
+        weight = []
+        fat = []
+        time:list[datetime] = []
+        for i in self.read():
+            i.get(self.user)
+            weight.append(float(i.get(self.user).get("weight")))
+            fat.append(float(i.get(self.user).get("fat")))
+            time.append(i.get(self.user).get("time"))
+        plt.plot(time,weight,"b-o")
+        plt.plot(time,fat,"y-o")
+        plt.xlabel("Time")
+        plt.ylabel("Data")
+        plt.xlim(time[-1],time[0])
+        plt.ylim((min(fat)-5),(max(weight)+5))
+        plt.title("Wight & fat liner chart")
+        plt.legend(["weight","fat"],loc="best")
+        plt.show()
+
+
 
     def __check__(self):
         new = []
@@ -57,5 +83,4 @@ class Mangement:
         return state
 
 if __name__ == "__main__":
-    data = Mangement("entry.weight").read()
-    print(data)
+    system("python3 cli.py")
