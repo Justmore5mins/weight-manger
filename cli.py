@@ -56,6 +56,7 @@ while True:
             help.append("the write function: /write [weight] [fat] [time(optional)]")
             help.append("update function is update your basic imformation /update height=[your height]")
             help.append("/new [user name] [height]")
+            help.append("draw function: draw saved data into liner chart usage:/draw")
             help.append("/help <-- show this out")
             for i in help:
                 print(i)

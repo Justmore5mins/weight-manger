@@ -29,11 +29,12 @@ class Mangement:
                 file.write(writing)
     
     def read(self):
-            output:list[dict[str,dict[str,float|str]]] = []
+            output:list[dict[datetime,dict[str,float|str]]] = []
             entries = open(self.file,"r").readlines()[1:]
             for entry in entries:
                 elements = entry.split(" ")
-                output.append({self.user:{"time":elements[0],"weight":elements[1],"fat":elements[2],"BMI":elements[3]}})
+                output.append({self.user:{"time":datetime.strptime(elements[0],r"%Y-%m-%d"),"weight":float(elements[1]),"fat":float(elements[2]),"BMI":float(elements[3])}})
+            
             return output
     
     def write(self,weight:float,fat:float,TIME:str):
@@ -53,20 +54,27 @@ class Mangement:
         return Hi
 
     def draw(self):
-        weight = []
-        fat = []
-        time:list[datetime] = []
+        Ctimes:list[datetime] = []
+        Cweights:list[float] = []
+        Cfats:list[float] = []
+        times:list[datetime] = []
+        weights:list[float] = []
+        fats:list[float] = []
         for i in self.read():
-            i.get(self.user)
-            weight.append(float(i.get(self.user).get("weight")))
-            fat.append(float(i.get(self.user).get("fat")))
-            time.append(i.get(self.user).get("time"))
-        plt.plot(time,weight,"b-o")
-        plt.plot(time,fat,"y-o")
+            Ctimes.append(i.get(self.user).get("time"))
+            Cweights.append(float(i.get(self.user).get("weight")))
+            Cfats.append(float(i.get(self.user).get("fat")))
+        for i in self.__listup__(Ctimes,Cweights,Cfats):
+            time,weight,fat = i
+            times.append(time)
+            weights.append(weight)
+            fats.append(fat)
+        plt.plot(times,weights,"b-o")
+        plt.plot(times,fats,"y-o")
         plt.xlabel("Time")
         plt.ylabel("Data")
-        plt.xlim(time[-1],time[0])
-        plt.ylim((min(fat)-5),(max(weight)+5))
+        plt.xlim(times[-1],times[0])
+        plt.ylim((max(weights)+5),(min(fats)-5))
         plt.title("Wight & fat liner chart")
         plt.legend(["weight","fat"],loc="best")
         plt.show()
@@ -80,6 +88,10 @@ class Mangement:
             new.append(i[:-7])
         state = True if self.user in new else False
         return state
+    
+    def __listup__(self,time:list[datetime],weight:list[float],fat:list[float]):
+        return sorted(zip(time,weight,fat))
+
 
 if __name__ == "__main__":
     system("python3 cli.py")
