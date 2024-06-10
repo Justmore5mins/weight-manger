@@ -37,13 +37,12 @@ class Mangement:
             return output
     
     def write(self,weight:float,fat:float,TIME:str):
-        times:list[datetime] = []
         with open(self.file,"r") as file:
             data = file.readlines()
             height = float(data[0])
             bmi = f"{int(weight/((height/100) ** 2)*100)/100}"
         with open(self.file,"a") as file:
-            file.write(f"{TIME} {weight} {fat} {bmi}")
+            file.write(f"{TIME} {weight} {fat} {bmi}\n")
     def update(self,Hi:float):
         with open(self.file,"r") as file:
             data = file.readlines()
