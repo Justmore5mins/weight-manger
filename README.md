@@ -8,5 +8,7 @@ command lists so far:
 - /draw : draw saved data into linar diagram
 - /help : show the help list
 
+notes: write time format YYYY-MM-DD
+
 notes: Windows users reccommmand to put this application into C:\user\ProgramFiles(x86)
 and Mac users can create a folder for this file(beacuse it will crate folders)

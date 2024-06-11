@@ -30,7 +30,7 @@ while True:
                 print(i)
 
         if command == "/write":
-            time = parts[3] if len(parts) == 4 else datetime.today().strftime(r"%Y-%m-%d")
+            time = date(int(parts[3].split("-")[0]),int(parts[3].split("-")[1]),int(parts[3].split("-")[2])) if len(parts) == 4 else date.today()
             manger.write(TIME=time,weight=float(parts[1]),fat=float(parts[2]))
         if command == "/update":
             test = 0
