@@ -89,7 +89,7 @@ class Mangement:
         plt.plot(times,weights,"b-o")
         plt.plot(times,fats,"y-o")
         plt.xlabel("Time")
-        plt.ylabel("Data")
+        plt.ylabel("Weight & Fat Percentage")
         plt.xlim(times[-1],times[0])
         plt.ylim((min(fats)-5),(max(weights)+5))
         plt.title("Wight & fat liner chart")
