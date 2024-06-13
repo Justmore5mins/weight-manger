@@ -26,6 +26,9 @@ class Mangement:
                     writing += f"{data} "
                 file.write(writing)
     
+    def delete(self):
+        remove(self.file)
+
     def read(self):
             output:list[dict[datetime,dict[str,float|str]]] = []
             entries = open(self.file,"r").readlines()[1:]
@@ -95,8 +98,6 @@ class Mangement:
         plt.title("Wight & fat liner chart")
         plt.legend(["weight","fat"],loc="best")
         plt.show()
-
-
 
     def __check__(self):
         new = []

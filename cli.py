@@ -16,6 +16,10 @@ while True:
 
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])
+        if command == "/delete":
+            if input("Are you sure about that? (Y/n) ").lower() == "y":
+                if input("serious? (Y/n) ").lower() == "y":
+                    manger.delete()
         if command == "/read":
             dat:list[list[str]] = []
             output:list[str] = []
