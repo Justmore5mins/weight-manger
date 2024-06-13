@@ -1,7 +1,7 @@
 from core import *
 from datetime import date
 
-COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/draw","/help"]
+COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/delete","/draw","/help"]
 
 while True:
     entered = input("> ")

@@ -1,9 +1,9 @@
 from errors import *
 from os.path import isdir
-from os import mkdir,walk,getcwd
+from os import mkdir,walk,getcwd,remove
 from matplotlib import pyplot as plt
 from datetime import date,datetime
-from os import system
+from os import system #testing usage
 
 class Mangement:
     def __init__(self,user:str) -> None:
