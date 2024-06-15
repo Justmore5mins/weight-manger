@@ -12,7 +12,8 @@ while True:
     else:
         if command == "/load":
             user = parts[1]
-            manger = Mangement(user) if Mangement(user).__check__() else print("The user not exists")
+            password = ""
+            manger = Mangement(user,password) if Mangement(user,password).__check__() else print("The user not exists")
 
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])
@@ -29,7 +30,7 @@ while True:
                 data = entry.get(user)
                 dat.append([data.get("time"),user,data.get("weight"),data.get("fat"),data.get("BMI")])
             for time,user,weight,fat,bmi in dat:
-                output.append(f"{time}  {user+" "*(10-len(user))}{weight+" "*(9-len(weight))}{bmi}")
+                output.append(f"{time}  {user+" "*(10-len(user))}{str(weight)+" "*(9-len(str(weight)))}{bmi}")
             for i in output:
                 print(i)
 
@@ -37,16 +38,15 @@ while True:
             time = date(int(parts[3].split("-")[0]),int(parts[3].split("-")[1]),int(parts[3].split("-")[2])) if len(parts) == 4 else date.today()
             manger.write(TIME=time,weight=float(parts[1]),fat=float(parts[2]))
         if command == "/update":
+            print("modify one item a time")
             test = 0
-            height = parts[1].split("=")[0]
-            if height.lower() == "height":
-                if manger.update(Hi=float(parts[1].split("=")[-1])) is None and test <= 10:
-                    manger.update(Hi=float(parts[1].split("=")[-1]))
-                    test += 1
-                elif manger.update(Hi=float(parts[1].split("=")[-1])) is None and test == 11:
-                    raise InternalError("Go GitHub write an issue and ")
+            key,value = parts[1].split("=")
+            ablelist = ["username","password","height"]
+            if key not in ablelist:
+                print(f"it is only support {ablelist} so far")
             else:
-                print("it is only support height so far")
+                manger.update(key=value)
+
         
         if command == "/draw":
             manger.draw()

@@ -6,50 +6,62 @@ from datetime import date,datetime
 from os import system #testing usage
 
 class Mangement:
-    def __init__(self,user:str) -> None:
-        self.user = user if isdir("data") is True else self.__create__(user)
-        self.file = f"data/{user}.weight"
+    def __init__(self,username:str,password) -> None:
+        self.password = password
+        self.username = username if isdir("data") is True else self.__create__(username)
+        self.file = f"data/{username}.weight"
+        self.userinfo = f"data/info/{username}.info"
 
     def __create__(self,username:str):
         mkdir("data")
-        self.user = username
+        return username
 
-    def new(self,Data:list[str]):
+    def new(self,Data:list):
+            """
+            .info file format:
+            [user] [password] [height]
+            """
             if self.__check__():
                 raise UserError("The user exists")
             else:
                 pass
-            writing = ""
+            writing:str = ""
             open(self.file,"x").close()
-            with open(self.file,"w") as file:
-                for data in Data:
-                    writing += f"{data} "
+            open(self.userinfo,"x").close()
+            with open(self.userinfo,"w") as file:
+                for info in Data:
+                    writing += f"{info} "
                 file.write(writing)
-    
+
     def delete(self):
         remove(self.file)
 
     def read(self):
-            output:list[dict[datetime,dict[str,float|str]]] = []
-            entries = open(self.file,"r").readlines()[1:]
+            output:list[dict[str,dict[str,float|date]]] = []
+            entries = open(self.file,"r").readlines()
             for entry in entries:
                 elements = entry.split(" ")
-                output.append({self.user:{"time":datetime.strptime(elements[0],r"%Y-%m-%d"),"weight":float(elements[1]),"fat":float(elements[2]),"BMI":float(elements[3])}})
-            
+                output.append({self.username:{"time":date(int(elements[0].split("-")[0]),int(elements[0].split("-")[1]),int(elements[0].split("-")[2])),"weight":float(elements[1]),"fat":float(elements[2]),"BMI":float(elements[3])}})
+
             return output
-    
+
     def write(self,weight:float,fat:float,TIME:date):
+        infos:dict[str,float] = []
         with open(self.file,"r") as file:
+            with open(self.userinfo,"r") as data:
+                for info in data.readlines():
+                    user, password, height = info.split(" ")
+                    infos[user] = float(height)
+            bmi = weight/(infos.get(self.username) ** 2)
             data = file.readlines()
-            height = float(data[0])
-            bmi = f"{int(weight/((height/100) ** 2)*100)/100}"
+            data.append(f"{TIME} {weight} {fat} {bmi}")
         with open(self.file,"w") as file:
-            if len(data[1:]) > 0:
+            if len(data) > 0:
                 times:list[date] = []
                 weights:list[float] = []
                 fats:list[float] = []
                 bmis:list[float] = []
-                for i in data[1:]:
+                for i in data:
                     Ctime, Cweight, Cfat, Cbmi = i.split(" ")
                     Ctime = date(int(Ctime.split("-")[0]),int(Ctime.split("-")[1]),int(Ctime.split("-")[2]))
                     Cweight = float(Cweight)
@@ -59,10 +71,6 @@ class Mangement:
                     weights.append(Cweight)
                     fats.append(Cfat)
                     bmis.append(Cbmi)
-                times.append(TIME)
-                weights.append(weight)
-                fats.append(fat)
-                bmis.append(bmi)
                 file.write(f"{data[0]}")
                 for i in self.__listup__(times,weights,fats,bmis):
                     time,weight,fat,bmi = i
@@ -70,21 +78,30 @@ class Mangement:
             else:
                 file.write(f"{data[0]}")
                 file.write(f"\n{TIME} {weight} {fat} {bmi}")
-    def update(self,Hi:float):
-        with open(self.file,"r") as file:
-            data = file.readlines()
-            data[0] = f"{Hi}" if data else data.append(f"{Hi}")
-        with open(self.file,"w") as file:
-            for i in data:
-                file.write(f"{i}")
-        return Hi
+    def update(self,**modify):
+        """
+        format:
+        >>> {user:{want to modify:"value"}}
+        """
+        writing:list[str] = []
+        infos:dict[str,dict[str,str|float]] = {}
+        with open(self.userinfo,"r") as file:
+            for data in file.readlines():
+                username, password, height = data.split(" ")
+                infos[username] = {"password":password,"height":float(height)}
+        for key in modify.keys():
+            infos[username][key] = modify[key]
+        
+        for user in infos:
+            writing.append(f"{user} {infos[user]["password"]} {infos[user]["height"]}")
+        return writing
 
     def draw(self):
         times:list[date] = []
         weights:list[float] = []
         fats:list[float] = []
         with open(self.file,"r") as file:
-            info = file.readlines()[1:]
+            info = file.readlines()
             for i in info:
                 times.append(datetime(int(i.split(" ")[0].split("-")[0]),int(i.split(" ")[0].split("-")[1]),int(i.split(" ")[0].split("-")[2])))
                 weights.append(float(i.split(" ")[1]))
@@ -104,9 +121,9 @@ class Mangement:
         userlist = next(walk(f"{getcwd()}/data"))[2]
         for i in userlist:
             new.append(i[:-7])
-        state = True if self.user in new else False
+        state = True if self.username in new else False
         return state
-    
+
     def __listup__(self,time:list[date],weight:list[float],fat:list[float],bmi:list[float]):
         return sorted(zip(time,weight,fat,bmi))
 
