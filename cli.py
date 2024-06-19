@@ -10,10 +10,10 @@ while True:
     if command not in COMMANDLIST:
         print("read /help to know what command you can use")
     else:
-        if command == "/load":
+        if command == "/login":
             user = parts[1]
-            password = ""
-            manger = Mangement(user,password) if Mangement(user,password).__check__() else print("The user not exists")
+            password = parts[2]
+            manger = Mangement(user,password)
 
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])

@@ -6,33 +6,32 @@ from datetime import date,datetime
 from os import system #testing usage
 
 class Mangement:
-    def __init__(self,username:str,password) -> None:
+    def __init__(self,username:str,password:str) -> None:
+        self.username = username
         self.password = password
-        self.username = username if isdir("data") is True else self.__create__(username)
         self.file = f"data/{username}.weight"
-        self.userinfo = f"data/info/{username}.info"
+        self.userinfo = f"data/{username}.info"
+        if isdir("data") and isdir("keys"):
+            pass
+        else:
+            self.__create__(username,["data",["keys"]])
+        
+    def login(self):
+        pass
 
-    def __create__(self,username:str):
-        mkdir("data")
-        return username
-
-    def new(self,Data:list):
+    def new(self,Data:tuple[str,str,float]):
             """
             .info file format:
-            [user] [password] [height]
+            [user] [password] [height] [salt]
             """
             if self.__check__():
                 raise UserError("The user exists")
             else:
                 pass
-            writing:str = ""
             open(self.file,"x").close()
             open(self.userinfo,"x").close()
-            with open(self.userinfo,"w") as file:
-                for info in Data:
-                    writing += f"{info} "
-                file.write(writing)
-
+            username,password,height = Data
+            
     def delete(self):
         remove(self.file)
 
@@ -115,6 +114,10 @@ class Mangement:
         plt.title("Wight & fat liner chart")
         plt.legend(["weight","fat"],loc="best")
         plt.show()
+
+    def __create__(self,username:str,dirs:list[str]):
+        mkdir(dirname for dirname in dirs)
+        return username
 
     def __check__(self):
         new = []
