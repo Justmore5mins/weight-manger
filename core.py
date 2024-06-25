@@ -27,14 +27,48 @@ class Mangement:
     
     def login(self):
         userinfo:dict = {}
+        usernames:list = []
+        passwords:list = []
         with open(self.info) as file:
             for data in file.readlines():
-                userinfo["username"] = data.split(" ")[0]
-                userinfo["password"] = data.split(" ")[1]
-        if self.username not in userinfo.keys():
-            print("the user not exists")
+                usernames.append(data.split(" ")[0])
+                passwords.append(data.split(" ")[1])
+                userinfo["username"] = usernames
+                usernames["password"] = passwords
+        if self.username not in userinfo.get("username"):
+            return int(1)
+        
         else:
-            
+            items = dict(zip(usernames,passwords))
+            password = EasyEncrypt(items.get(self.username)).decrypt()
+            state:int = 0 if self.password == password else 2
+            self.height = float(data.split(" ")[2])
+            return state
+                
+    def add(self,time:date,weight:float,fat:float):
+        Times:list[date] = []
+        Weights:list[float] = []
+        Fats:list[float] = []
+        Bmis:list[float] = []
+        with open(self.file,"r") as file:
+            for info in file.readlines():
+                Time, Weight, Fat, Bmi = info.split(" ")
+                Times.append(date(int(Time.split(" ")[0])),int(Time.split(" ")[1]),int(Time.split(" ")[2]))
+                Weights.append(Weight)
+                Fats.append(Fat)
+                Bmis.append(Bmi)
+        Times.append(time)
+        Weights.append(weight)
+        Fats.append(fat)
+        Bmis.append((weight/(self.height ** 2)))
+
+    def __listup__(times:list[date],weights:list[float], fats:list[float], bmis:list[float]) -> list[str]:
+        returning:list[str] = []
+        Sorted = sorted(zip(times,weights,fats,bmis))
+        for item in Sorted:
+            time,weight,fat,bmi = item
+            returning.append(f"{time} {weight} {fat} {bmi}")
+        return returning
 
     def __check__(self):
         return isfile(f"data/{self.username}.info")

@@ -13,7 +13,15 @@ while True:
         if command == "/login":
             user = parts[1]
             password = parts[2]
-            manger = Mangement(user,password)
+            state = Mangement(user,password).login()
+            if state == 0:
+                manger = Mangement(user,password)
+            elif state == 1:
+                print("The user exists")
+            elif state == 2:
+                print("the password(or user) is wrong")
+            else:
+                print("i remember that i haven't set this exception")
 
         if command == "/new":
             Mangement(parts[1]).new([float(parts[2])])
