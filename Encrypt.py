@@ -1,11 +1,11 @@
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP,AES
-from Crypto.Random import get_random_bytes
-from base64 import b64encode,b64decode
+from Crypto.Cipher import PKCS1_OAEP
+from base64 import b64encode,b64decode,b85encode,b85decode
 from core import *
+from SideCode import userinfo
 
 class AdavancedEncryption:
-    def __init__(self,user:Mangement) -> None:
+    def __init__(self,user:userinfo) -> None:
         self.username = user.username
         self.password = user.password
     def new(self):
@@ -33,22 +33,12 @@ class AdavancedEncryption:
             decrypted.append(cipher.decrypt(b64decode(info)).decode())
         return decrypted
 
-class EasyEncryption:
-    def __init__(self,text:str,salt:bytes = get_random_bytes(32)) -> None:
-        self.text = text
-        self.salt = salt
-
-    def encrypt(self) -> tuple[int,int,bytes]:
-        """
-        Returns encrypted, tag and nonce
-        """
-        cipher = AES.new(self.salt,AES.MODE_EAX)
-        encrypted, tag = cipher.encrypt(bytes(self.text))
-        nonce = cipher.nonce
-        return encrypted,tag,nonce,self.salt
+class EasyEncrypt:
+    def __init__(self,text:str) -> None:
+        self.text = bytes(text)
     
-    def decrypt(self,nonce:bytes|str,tag:int):
-        if type(nonce) == str:
-            nonce =  bytes(nonce)
-        cipher = AES.new(self.salt,AES.MODE_EAX)
-        return cipher.decrypt_and_verify(self.text,tag).decode()
+    def encrypt(self):
+        return b85encode(b64encode(self.text)).decode()
+    
+    def decrypt(self):
+        return b64decode(b85decode(self.text)).decode()

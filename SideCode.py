@@ -8,3 +8,9 @@ def ReadInfo(User:Entry,Password:Entry):
 
 def New(username:str,height:float):
     Mangement(username).new([height]) if username != "" else None
+
+class userinfo:
+    def __init__(self,username:str,password:str,data:list = []) -> None:
+        self.username = username
+        self.password = password
+        self.data = data
