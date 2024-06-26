@@ -1,3 +1,5 @@
+from ast import Bytes
+from torch import Value
 from errors import *
 from os.path import isdir,isfile
 from os import mkdir,walk,getcwd,remove
@@ -25,6 +27,18 @@ class Mangement:
         else:
             print("The user exists")
     
+    def delete(self):
+        remove(self.file)
+        pub, pri = self.keys
+        remove(pub)
+        remove(pri)
+        with open(self.info,"r") as read:
+            data = read.readlines()
+        with open(self.info,"r") as write:
+            for number,line in enumerate(data):
+                if number not in data.index(self.username):
+                    write.writelines(line)
+
     def login(self):
         userinfo:dict = {}
         usernames:list = []
@@ -45,7 +59,7 @@ class Mangement:
             self.height = float(data.split(" ")[2])
             return state
                 
-    def add(self,time:date,weight:float,fat:float):
+    def write(self,time:date,weight:float,fat:float):
         Times:list[date] = []
         Weights:list[float] = []
         Fats:list[float] = []
@@ -61,12 +75,46 @@ class Mangement:
         Weights.append(weight)
         Fats.append(fat)
         Bmis.append((weight/(self.height ** 2)))
-
-    def __listup__(times:list[date],weights:list[float], fats:list[float], bmis:list[float]) -> list[str]:
+        with open(self.file,"w") as file:
+            file.writelines(AdavancedEncryption(userinfo(self.username,self.password)).encrypt(self.__listup__(Times,Weights,Fats,Bmis,True)))
+    
+    def read(self):
+        with open(self.file,"r") as file:
+            for data in file.readlines():
+                print(data)
+    
+    def update(self,username:str,**data):
+        """
+        **data support data types:
+        username:str
+        password:str
+        height:float
+        """
+        with open(self.info,"r") as file:
+            raw = file.readlines()
+        for info in raw:
+            if info.split(" ")[0] == username:
+                for new in data.keys():
+                    if new == "username":
+                        info.split(" ")[0] = data.get("username")
+                    elif new == "password":
+                        info.split(" ")[1] = EasyEncrypt(data.get("password"))
+                    elif new == "height":
+                        info.split(" ")[2] = data.get("height")
+                    else:
+                        raise ValueError("Data type not supported]")
+        with open(self.info,"w") as file:
+            file.writelines(info)
+    def __listup__(times:list[date],weights:list[float], fats:list[float], bmis:list[float],isByte:bool) -> list[str]:
         returning:list[str] = []
         Sorted = sorted(zip(times,weights,fats,bmis))
         for item in Sorted:
             time,weight,fat,bmi = item
+            if isByte:
+                time = bytes(time.strftime(r"%Y-%M-%d"),"utf-8")
+                weight = bytes(str(weight),"utf-8")
+                fat = bytes(str(fat),"utf-8")
+                bmi = bytes(str(bmi),"utf-8")
             returning.append(f"{time} {weight} {fat} {bmi}")
         return returning
 
