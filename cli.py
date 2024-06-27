@@ -1,7 +1,7 @@
 from core import *
 from datetime import date
 
-COMMANDLIST = ["/load","/read","/write","/new","/update","/new","/delete","/draw","/help"]
+COMMANDLIST = ["/login","/read","/write","/new","/update","/delete","/draw","/help","/?"]
 
 while True:
     entered = input("> ")
@@ -11,64 +11,49 @@ while True:
         print("read /help to know what command you can use")
     else:
         if command == "/login":
-            user = parts[1]
             password = parts[2]
-            state = Mangement(user,password).login()
+            state:int = Mangement(parts[1],password).login()
+            while state != 0:
+                if state == 1:
+                    print("user not exists and retype whole command again")
+                if state == 2:
+                    print("password might wrong")
+                    password = input("please retype the password")
+                    state = Mangement(parts[1],password).login()
             if state == 0:
-                manger = Mangement(user,password)
-            elif state == 1:
-                print("The user exists")
-            elif state == 2:
-                print("the password(or user) is wrong")
-            else:
-                print("i remember that i haven't set this exception")
-
-        if command == "/new":
-            Mangement(parts[1]).new([float(parts[2])])
-        if command == "/delete":
-            if input("Are you sure about that? (Y/n) ").lower() == "y":
-                if input("serious? (Y/n) ").lower() == "y":
-                    manger.delete()
+                mange = Mangement(parts[1],password)
+                print(f"Welcome {parts[1]}")
+        
         if command == "/read":
-            dat:list[list[str]] = []
-            output:list[str] = []
-            output.append("Time        User      Weight   BMI")
-            output.append("----------------------------------")
-            for entry in manger.read():
-                data = entry.get(user)
-                dat.append([data.get("time"),user,data.get("weight"),data.get("fat"),data.get("BMI")])
-            for time,user,weight,fat,bmi in dat:
-                output.append(f"{time}  {user+" "*(10-len(user))}{str(weight)+" "*(9-len(str(weight)))}{bmi}")
-            for i in output:
-                print(i)
-
+            print(data for data in mange.read())
         if command == "/write":
-            time = date(int(parts[3].split("-")[0]),int(parts[3].split("-")[1]),int(parts[3].split("-")[2])) if len(parts) == 4 else date.today()
-            manger.write(TIME=time,weight=float(parts[1]),fat=float(parts[2]))
+            try:
+                time = date(parts[4].split(" ")[0],parts[4].split(" ")[1],parts[4].split(" ")[2])
+            except:
+                time = date.today()
+            mange.write(time,float(parts[1]),float(parts[2]))
+        if command == "/new":
+            Mangement(parts[1],parts[2]).new(float(parts[3]))
         if command == "/update":
-            print("modify one item a time")
-            test = 0
-            key,value = parts[1].split("=")
-            ablelist = ["username","password","height"]
-            if key not in ablelist:
-                print(f"it is only support {ablelist} so far")
+            key, value = parts[1].split("=")
+            mange.update(key=value)
+        if command == "/delete":
+            if input("r u serious? (Y/n)").lower() == "y":
+                if input("really? (Y/n)  ").lower == "y":
+                    mange.delete()
+                else:
+                    pass
             else:
-                manger.update(key=value)
-
-        
+                pass
         if command == "/draw":
-            manger.draw()
-        
-        if command == "/help":
-            help = []
-            help.append("This is a simple code that can record your weight easily")
-            help.append(f"there are {len(COMMANDLIST)} commmands: /load,/read,/write,/new,/update,/help")
-            help.append("load function's usage: /load [user name]")
-            help.append("read function: /read [user name]<-- this is the useage")
-            help.append("the write function: /write [weight] [fat] [time(optional)]")
-            help.append("update function is update your basic imformation /update height=[your height]")
-            help.append("/new [user name] [height]")
-            help.append("draw function: draw saved data into liner chart usage:/draw")
-            help.append("/help <-- show this out")
-            for i in help:
-                print(i)
+            mange.draw()
+        if command == "/help" or command == "/?":
+            print("This is a simple code which can record your weight data")
+            print(f"there are {len(COMMANDLIST)} commands, {COMMANDLIST}")
+            print("the /login command is log in to the user: /login {username} {password}")
+            print("the /read function can read data saved in it : /read")
+            print("the /new function can create new user: /new {username} {password} {height}")
+            print("the /update function updates the exists user's data: username password and height(edit one item per time):/update {target}={value}")
+            print("the /delete function is delete the exists user: /delete")
+            print("the /draw function uses exists data to draw the linar chart:/draw")
+            print("the /help or /? shows this")

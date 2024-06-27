@@ -35,7 +35,7 @@ class AdavancedEncryption:
 
 class EasyEncrypt:
     def __init__(self,text:str) -> None:
-        self.text = bytes(text)
+        self.text = bytes(text,"utf-8")
     
     def encrypt(self):
         return b85encode(b64encode(self.text)).decode()

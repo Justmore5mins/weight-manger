@@ -1,10 +1,8 @@
-from ast import Bytes
-from torch import Value
 from errors import *
 from os.path import isdir,isfile
-from os import mkdir,walk,getcwd,remove
+from os import remove,mkdir
 from matplotlib import pyplot as plt
-from datetime import date,datetime
+from datetime import date
 from os import system #testing usage
 from Encrypt import EasyEncrypt,AdavancedEncryption
 from SideCode import userinfo
@@ -13,19 +11,28 @@ class Mangement:
     def __init__(self,username:str,password:str) -> None:
         self.username = username
         self.password = password
+        mkdir("data") if not isdir("data") else None
+        mkdir("keys") if not isdir("keys") else None
         self.file = f"data/{username}.weight"
         self.keys = (f"keys/{username}pub.pem",f"keys/{username}pri.pem")
         self.info = f"data/global.info"
 
     def new(self,height:float):
-        if not isfile(self.file):
+        if not isfile(self.info):
             open(self.file,"x").close()
             open(self.info,"x").close() if not isfile(self.info) else None
             with open(self.info,"a") as file:
                 file.write(f"{self.username} {EasyEncrypt(self.password).encrypt()} {height} \n")
             AdavancedEncryption(userinfo(self.username,self.password)).new()
         else:
-            print("The user exists")
+            if self.__isuser__():
+                open(self.file,"x").close()
+                open(self.info,"x").close() if not isfile(self.info) else None
+                with open(self.info,"a") as file:
+                    file.write(f"{self.username} {EasyEncrypt(self.password).encrypt()} {height} \n")
+                AdavancedEncryption(userinfo(self.username,self.password)).new()
+            else:
+                print("The user exists")
     
     def delete(self):
         remove(self.file)
@@ -48,7 +55,7 @@ class Mangement:
                 usernames.append(data.split(" ")[0])
                 passwords.append(data.split(" ")[1])
                 userinfo["username"] = usernames
-                usernames["password"] = passwords
+                userinfo["password"] = passwords
         if self.username not in userinfo.get("username"):
             return int(1)
         
@@ -56,7 +63,6 @@ class Mangement:
             items = dict(zip(usernames,passwords))
             password = EasyEncrypt(items.get(self.username)).decrypt()
             state:int = 0 if self.password == password else 2
-            self.height = float(data.split(" ")[2])
             return state
                 
     def write(self,time:date,weight:float,fat:float):
@@ -71,19 +77,25 @@ class Mangement:
                 Weights.append(Weight)
                 Fats.append(Fat)
                 Bmis.append(Bmi)
+        with open(self.info) as file:
+            for data in file.readlines():
+                if self.username == data.split(" ")[0]:
+                    height = float(data.split(" ")[2])
         Times.append(time)
         Weights.append(weight)
         Fats.append(fat)
-        Bmis.append((weight/(self.height ** 2)))
+        Bmis.append((weight/(height ** 2)))
         with open(self.file,"w") as file:
-            file.writelines(AdavancedEncryption(userinfo(self.username,self.password)).encrypt(self.__listup__(Times,Weights,Fats,Bmis,True)))
+            file.writelines(AdavancedEncryption(userinfo(self.username,self.password)).encrypt(self.__listup__()))
     
     def read(self):
+        output:list[str] = []
         with open(self.file,"r") as file:
             for data in file.readlines():
-                print(data)
+                output.append(data)
+        return output
     
-    def update(self,username:str,**data):
+    def update(self,**data):
         """
         **data support data types:
         username:str
@@ -93,18 +105,31 @@ class Mangement:
         with open(self.info,"r") as file:
             raw = file.readlines()
         for info in raw:
-            if info.split(" ")[0] == username:
+            if info.split(" ")[0] == self.username:
                 for new in data.keys():
                     if new == "username":
                         info.split(" ")[0] = data.get("username")
                     elif new == "password":
-                        info.split(" ")[1] = EasyEncrypt(data.get("password"))
+                        info.split(" ")[1] = EasyEncrypt(data.get("password")).encrypt()
                     elif new == "height":
                         info.split(" ")[2] = data.get("height")
                     else:
                         raise ValueError("Data type not supported]")
         with open(self.info,"w") as file:
             file.writelines(info)
+
+    def draw(self):
+        TimeList:list[date] = []
+        WeightList:list[float] = []
+        FatList:list[float] = []
+        for data in self.read():
+            time = date(data.split(" ")[0].split("-")[0],data.split(" ")[0].split("-")[1],data.split(" ")[0].split("-")[2])
+            WeightList.append(float(data.split(" ")[1]))
+            FatList.append(float(data.split(" ")[2]))
+            TimeList.append(time)
+        plt.plot(TimeList,WeightList,"c-o")
+        plt.plot(TimeList,FatList,"g-0")
+        plt.title("Weight & fat data")
     def __listup__(times:list[date],weights:list[float], fats:list[float], bmis:list[float],isByte:bool) -> list[str]:
         returning:list[str] = []
         Sorted = sorted(zip(times,weights,fats,bmis))
@@ -120,3 +145,11 @@ class Mangement:
 
     def __check__(self):
         return isfile(f"data/{self.username}.info")
+    
+    def __isuser__(self):
+        userlist:list[str] = []
+        with open(self.info,"r") as file:
+            for raw in file.readlines():
+                userlist.append(raw.split(" ")[0])
+        state = True if self.username in userlist else False
+        return state
