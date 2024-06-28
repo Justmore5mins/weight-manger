@@ -78,12 +78,12 @@ class Mangement:
             if len(data) == 0 or data[0] == "":
                 pass
             else:
-                for a in file.readlines():
+                for a in data:
                     A.append(bytes(a,"utf-8"))
                 raw = AdavancedEncryption(userinfo(self.username,self.password)).decrypt(A)
                 for info in raw:
                     Time, Weight, Fat, Bmi = info.split(" ")
-                    Times.append(date(int(Time.split(" ")[0])),int(Time.split(" ")[1]),int(Time.split(" ")[2]))
+                    Times.append(date(year=int(Time.split("-")[0][2:]),month=int(Time.split("-")[1]),day=int(Time.split("-")[2][:-1])))
                     Weights.append(Weight)
                     Fats.append(Fat)
                     Bmis.append(Bmi)
