@@ -6,6 +6,8 @@ from datetime import date
 from os import system #testing usage
 from Encrypt import EasyEncrypt,AdavancedEncryption
 from SideCode import userinfo
+from os import system
+system("clear")
 
 class Mangement:
     def __init__(self,username:str,password:str) -> None:
@@ -70,13 +72,21 @@ class Mangement:
         Weights:list[float] = []
         Fats:list[float] = []
         Bmis:list[float] = []
+        A:list[bytes] = []
         with open(self.file,"r") as file:
-            for info in file.readlines():
-                Time, Weight, Fat, Bmi = info.split(" ")
-                Times.append(date(int(Time.split(" ")[0])),int(Time.split(" ")[1]),int(Time.split(" ")[2]))
-                Weights.append(Weight)
-                Fats.append(Fat)
-                Bmis.append(Bmi)
+            data = file.readlines()
+            if len(data) == 0 or data[0] == "":
+                pass
+            else:
+                for a in file.readlines():
+                    A.append(bytes(a,"utf-8"))
+                raw = AdavancedEncryption(userinfo(self.username,self.password)).decrypt(A)
+                for info in raw:
+                    Time, Weight, Fat, Bmi = info.split(" ")
+                    Times.append(date(int(Time.split(" ")[0])),int(Time.split(" ")[1]),int(Time.split(" ")[2]))
+                    Weights.append(Weight)
+                    Fats.append(Fat)
+                    Bmis.append(Bmi)
         with open(self.info) as file:
             for data in file.readlines():
                 if self.username == data.split(" ")[0]:
@@ -86,13 +96,13 @@ class Mangement:
         Fats.append(fat)
         Bmis.append((weight/(height ** 2)))
         with open(self.file,"w") as file:
-            file.writelines(AdavancedEncryption(userinfo(self.username,self.password)).encrypt(self.__listup__()))
-    
+            file.writelines(AdavancedEncryption(userinfo(self.username,self.password)).encrypt(self.__listup__(Times,Weights,Fats,Bmis)))
+
     def read(self):
         output:list[str] = []
-        with open(self.file,"r") as file:
+        with open(self.file) as file:
             for data in file.readlines():
-                output.append(data)
+                output.append(AdavancedEncryption(userinfo(self.username,self.password)).decrypt(bytes(data,"utf-8")))
         return output
     
     def update(self,**data):
@@ -114,7 +124,7 @@ class Mangement:
                     elif new == "height":
                         info.split(" ")[2] = data.get("height")
                     else:
-                        raise ValueError("Data type not supported]")
+                        raise ValueError("Data type not supported")
         with open(self.info,"w") as file:
             file.writelines(info)
 
@@ -130,17 +140,16 @@ class Mangement:
         plt.plot(TimeList,WeightList,"c-o")
         plt.plot(TimeList,FatList,"g-0")
         plt.title("Weight & fat data")
-    def __listup__(times:list[date],weights:list[float], fats:list[float], bmis:list[float],isByte:bool) -> list[str]:
-        returning:list[str] = []
+    def __listup__(self,times:list[date],weights:list[float], fats:list[float], bmis:list[float]):
+        returning:list[str|bytes] = []
         Sorted = sorted(zip(times,weights,fats,bmis))
         for item in Sorted:
             time,weight,fat,bmi = item
-            if isByte:
-                time = bytes(time.strftime(r"%Y-%M-%d"),"utf-8")
-                weight = bytes(str(weight),"utf-8")
-                fat = bytes(str(fat),"utf-8")
-                bmi = bytes(str(bmi),"utf-8")
-            returning.append(f"{time} {weight} {fat} {bmi}")
+            time = bytes(time.strftime(r"%Y-%M-%d"),"utf-8")
+            weight = bytes(str(weight),"utf-8")
+            fat = bytes(str(fat),"utf-8")
+            bmi = bytes(str(bmi),"utf-8")
+            returning.append(bytes(f"{time} {weight} {fat} {bmi}","utf-8"))
         return returning
 
     def __check__(self):

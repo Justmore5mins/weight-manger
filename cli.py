@@ -28,7 +28,7 @@ while True:
             print(data for data in mange.read())
         if command == "/write":
             try:
-                time = date(parts[4].split(" ")[0],parts[4].split(" ")[1],parts[4].split(" ")[2])
+                time = date(parts[3].split("-")[0],parts[4].split("-")[1],parts[4].split("-")[2])
             except:
                 time = date.today()
             mange.write(time,float(parts[1]),float(parts[2]))
